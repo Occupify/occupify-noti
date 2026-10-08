@@ -1,9 +1,27 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
     password:
+  flyway:
+    enabled: false
   jpa:
     hibernate:
       ddl-auto: create-drop
+    show-sql: false
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+
+app:
+  rabbitmq:
+    exchange: occupify.notification.exchange
+    queue: occupify.notification.queue
+    routing-key: notification.#
+    dlx-exchange: occupify.notification.dlx
+    dlq-queue: occupify.notification.dlq
+    dlq-routing-key: notification.dlq
+    user-queue: occupify.notification.user.queue
+    user-routing-key: user.#
