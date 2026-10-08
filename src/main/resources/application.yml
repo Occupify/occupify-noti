@@ -4,11 +4,23 @@ server:
 spring:
   application:
     name: occupify-noti
+  web:
+    resources:
+      add-mappings: true
+      static-locations: classpath:/static/
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5533/occupify_noti}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,11 +28,47 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-attempts: 3
+          multiplier: 2.0
   mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:1025}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+app:
+  otp:
+    expiration-minutes: ${OTP_EXPIRATION_MINUTES:5}
+  rabbitmq:
+    exchange: ${NOTIFICATION_EXCHANGE:occupify.notification.exchange}
+    queue: ${NOTIFICATION_QUEUE:occupify.notification.queue}
+    routing-key: ${NOTIFICATION_ROUTING_KEY:notification.#}
+    dlx-exchange: ${NOTIFICATION_DLX_EXCHANGE:occupify.notification.dlx}
+    dlq-queue: ${NOTIFICATION_DLQ_QUEUE:occupify.notification.dlq}
+    dlq-routing-key: ${NOTIFICATION_DLQ_ROUTING_KEY:notification.dlq}
+    user-queue: ${USER_QUEUE:occupify.notification.user.queue}
+    user-routing-key: ${USER_ROUTING_KEY:user.#}
+
 
 management:
   endpoints:
@@ -30,3 +78,14 @@ management:
   endpoint:
     health:
       show-details: always
+
+scalar:
+  path: ${SCALAR_PATH:/docs}
+  url: ${SCALAR_URL:/v3/api-docs}
+  enabled: ${SCALAR_ENABLED:true}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
