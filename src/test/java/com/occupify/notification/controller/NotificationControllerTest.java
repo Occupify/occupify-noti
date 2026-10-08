@@ -62,7 +62,7 @@ class NotificationControllerTest {
 
         when(notificationService.getNotifications(userId, 0, 10)).thenReturn(pageResponse);
 
-        mockMvc.perform(get("/api/v1/notifications")
+        mockMvc.perform(get("/notifications")
                         .header("X-User-Id", userId.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -71,20 +71,20 @@ class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/notifications should return 403 when no authentication provided")
+    @DisplayName("GET /notifications should return 403 when no authentication provided")
     void shouldReturnForbiddenWhenNoAuth() throws Exception {
-        mockMvc.perform(get("/api/v1/notifications")
+        mockMvc.perform(get("/notifications")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @DisplayName("GET /api/v1/notifications/unread-count should return unread count")
+    @DisplayName("GET /notifications/unread-count should return unread count")
     void shouldReturnUnreadCount() throws Exception {
         UUID userId = UUID.randomUUID();
         when(notificationService.getUnreadCount(userId)).thenReturn(5L);
 
-        mockMvc.perform(get("/api/v1/notifications/unread-count")
+        mockMvc.perform(get("/notifications/unread-count")
                         .header("X-User-Id", userId.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -93,12 +93,12 @@ class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/notifications/{id}/read should mark as read")
+    @DisplayName("PUT /notifications/{id}/read should mark as read")
     void shouldMarkAsRead() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID notiId = UUID.randomUUID();
 
-        mockMvc.perform(put("/api/v1/notifications/" + notiId + "/read")
+        mockMvc.perform(put("/notifications/" + notiId + "/read")
                         .header("X-User-Id", userId.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -109,11 +109,11 @@ class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/v1/notifications/read-all should mark all as read")
+    @DisplayName("PUT /notifications/read-all should mark all as read")
     void shouldMarkAllAsRead() throws Exception {
         UUID userId = UUID.randomUUID();
 
-        mockMvc.perform(put("/api/v1/notifications/read-all")
+        mockMvc.perform(put("/notifications/read-all")
                         .header("X-User-Id", userId.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -124,12 +124,12 @@ class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/notifications/{id} should delete notification")
+    @DisplayName("DELETE /notifications/{id} should delete notification")
     void shouldDeleteNotification() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID notiId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/api/v1/notifications/" + notiId)
+        mockMvc.perform(delete("/notifications/" + notiId)
                         .header("X-User-Id", userId.toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

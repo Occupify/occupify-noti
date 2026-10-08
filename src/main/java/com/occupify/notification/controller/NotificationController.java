@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping({ "/notifications" })
+@RequestMapping("/notifications")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Notification", description = "Notification management APIs")
