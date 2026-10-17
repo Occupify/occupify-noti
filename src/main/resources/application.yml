@@ -11,7 +11,7 @@ spring:
   config:
     import:
       - optional:file:.env[.properties]
-      - optional:file:../.env[.properties]
+      - optional:file:noti.env[.properties]
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5533/occupify_noti}
     username: ${POSTGRES_USER:postgres}
