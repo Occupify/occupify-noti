@@ -38,6 +38,9 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.user-queue:occupify.notification.user.queue}")
     private String userQueueName;
 
+    @Value("${app.rabbitmq.user-exchange:occupify.user.exchange}")
+    private String userExchangeName;
+
     @Value("${app.rabbitmq.user-routing-key:user.#}")
     private String userRoutingKey;
 
@@ -98,6 +101,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public TopicExchange userExchange() {
+        return new TopicExchange(userExchangeName, true, false);
+    }
+
+    @Bean
+    public Binding userExchangeBinding(Queue userQueue, TopicExchange userExchange) {
+        return BindingBuilder.bind(userQueue)
+                .to(userExchange)
+                .with(userRoutingKey);
+    }
+
+    @Bean
     public MessageConverter jackson2JsonMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -109,11 +124,14 @@ public class RabbitMQConfig {
 
         Map<String, Class<?>> idClassMapping = new HashMap<>();
         idClassMapping.put("com.occupify.identity.event.UserRegisteredEvent", com.occupify.notification.dto.event.UserRegisteredEvent.class);
+        idClassMapping.put("com.occupify.identity.event.UserActivatedEvent", com.occupify.notification.dto.event.UserActivatedEvent.class);
         idClassMapping.put("com.occupify.identity.event.PasswordResetRequestedEvent", com.occupify.notification.dto.event.PasswordResetRequestedEvent.class);
         idClassMapping.put("com.occupify.notification.dto.event.UserRegisteredEvent", com.occupify.notification.dto.event.UserRegisteredEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.UserActivatedEvent", com.occupify.notification.dto.event.UserActivatedEvent.class);
         idClassMapping.put("com.occupify.notification.dto.event.PasswordResetRequestedEvent", com.occupify.notification.dto.event.PasswordResetRequestedEvent.class);
         idClassMapping.put("com.occupify.notification.dto.event.NotificationEventPayload", com.occupify.notification.dto.event.NotificationEventPayload.class);
         idClassMapping.put("UserRegisteredEvent", com.occupify.notification.dto.event.UserRegisteredEvent.class);
+        idClassMapping.put("UserActivatedEvent", com.occupify.notification.dto.event.UserActivatedEvent.class);
         idClassMapping.put("PasswordResetRequestedEvent", com.occupify.notification.dto.event.PasswordResetRequestedEvent.class);
         idClassMapping.put("NotificationEventPayload", com.occupify.notification.dto.event.NotificationEventPayload.class);
         typeMapper.setIdClassMapping(idClassMapping);

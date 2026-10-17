@@ -11,7 +11,7 @@ spring:
   config:
     import:
       - optional:file:.env[.properties]
-      - optional:file:../.env[.properties]
+      - optional:file:noti.env[.properties]
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5533/occupify_noti}
     username: ${POSTGRES_USER:postgres}
@@ -66,6 +66,7 @@ app:
     dlx-exchange: ${NOTIFICATION_DLX_EXCHANGE:occupify.notification.dlx}
     dlq-queue: ${NOTIFICATION_DLQ_QUEUE:occupify.notification.dlq}
     dlq-routing-key: ${NOTIFICATION_DLQ_ROUTING_KEY:notification.dlq}
+    user-exchange: ${USER_EXCHANGE:occupify.user.exchange}
     user-queue: ${USER_QUEUE:occupify.notification.user.queue}
     user-routing-key: ${USER_ROUTING_KEY:user.#}
 

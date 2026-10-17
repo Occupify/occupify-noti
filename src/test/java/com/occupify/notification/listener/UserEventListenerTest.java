@@ -1,6 +1,7 @@
 package com.occupify.notification.listener;
 
 import com.occupify.notification.dto.event.PasswordResetRequestedEvent;
+import com.occupify.notification.dto.event.UserActivatedEvent;
 import com.occupify.notification.dto.event.UserRegisteredEvent;
 import com.occupify.notification.service.EmailService;
 import com.occupify.notification.service.NotificationService;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -30,14 +32,14 @@ class UserEventListenerTest {
     private UserEventListener listener;
 
     @Test
-    @DisplayName("Should handle user registered event and dispatch registration OTP email")
+    @DisplayName("Should handle user registered event and dispatch registration OTP email without syncing user")
     void shouldHandleUserRegisteredEvent() {
         UUID userId = UUID.randomUUID();
         UserRegisteredEvent event = new UserRegisteredEvent(userId, "newuser@occupify.com", "123456", Instant.now());
 
         listener.handleUserRegisteredEvent(event);
 
-        verify(notificationService).processUserRegisteredEvent(event);
+        verify(notificationService, never()).processUserRegisteredEvent(any());
         verify(emailService).sendRegistrationOtp("newuser@occupify.com", "123456");
     }
 
@@ -49,8 +51,19 @@ class UserEventListenerTest {
 
         listener.handleUserRegisteredEvent(event);
 
-        verify(notificationService).processUserRegisteredEvent(event);
+        verify(notificationService, never()).processUserRegisteredEvent(any());
         verify(emailService, never()).sendRegistrationOtp(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString());
+    }
+
+    @Test
+    @DisplayName("Should handle user activated event and sync user")
+    void shouldHandleUserActivatedEvent() {
+        UUID userId = UUID.randomUUID();
+        UserActivatedEvent event = new UserActivatedEvent(userId, "active@occupify.com", "Active User", "USER", "ACTIVE", Instant.now());
+
+        listener.handleUserActivatedEvent(event);
+
+        verify(notificationService).processUserActivatedEvent(event);
     }
 
     @Test
