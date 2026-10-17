@@ -1,6 +1,7 @@
 package com.occupify.notification.listener;
 
 import com.occupify.notification.dto.event.PasswordResetRequestedEvent;
+import com.occupify.notification.dto.event.UserActivatedEvent;
 import com.occupify.notification.dto.event.UserRegisteredEvent;
 import com.occupify.notification.service.EmailService;
 import com.occupify.notification.service.NotificationService;
@@ -21,12 +22,19 @@ public class UserEventListener {
 
     @RabbitHandler
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
-        log.info("[Event Listener] Processing user registered event for user [{}] ({})",
+        log.info("[Event Listener] Processing user registered event (send OTP) for user [{}] ({})",
                 event.userId(), event.email());
-        notificationService.processUserRegisteredEvent(event);
+        log.info(">> [NOTIFICATION DEV OTP] Registration OTP for [{}]: {}", event.email(), event.otpCode());
         if (event.email() != null && !event.email().isBlank() && event.otpCode() != null && !event.otpCode().isBlank()) {
             emailService.sendRegistrationOtp(event.email(), event.otpCode());
         }
+    }
+
+    @RabbitHandler
+    public void handleUserActivatedEvent(UserActivatedEvent event) {
+        log.info("[Event Listener] Processing user activated event for user [{}] ({})",
+                event.userId(), event.email());
+        notificationService.processUserActivatedEvent(event);
     }
 
     @RabbitHandler

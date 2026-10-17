@@ -66,6 +66,7 @@ app:
     dlx-exchange: ${NOTIFICATION_DLX_EXCHANGE:occupify.notification.dlx}
     dlq-queue: ${NOTIFICATION_DLQ_QUEUE:occupify.notification.dlq}
     dlq-routing-key: ${NOTIFICATION_DLQ_ROUTING_KEY:notification.dlq}
+    user-exchange: ${USER_EXCHANGE:occupify.user.exchange}
     user-queue: ${USER_QUEUE:occupify.notification.user.queue}
     user-routing-key: ${USER_ROUTING_KEY:user.#}
 
