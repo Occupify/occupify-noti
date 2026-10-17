@@ -17,8 +17,6 @@ import java.util.UUID;
 })
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class User {
 
@@ -38,4 +36,15 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public User() {
+    }
+
+    public User(UUID id, String email, String fullName, String avatarUrl, LocalDateTime createdAt) {
+        this.id = id;
+        this.email = email;
+        this.fullName = fullName;
+        this.avatarUrl = avatarUrl;
+        this.createdAt = createdAt;
+    }
 }
