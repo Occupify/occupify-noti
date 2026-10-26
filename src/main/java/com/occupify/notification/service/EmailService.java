@@ -5,4 +5,6 @@ public interface EmailService {
     void sendRegistrationOtp(String recipientEmail, String otpCode);
 
     void sendPasswordResetOtp(String recipientEmail, String otpCode);
+
+    void sendNotificationEmail(String recipientEmail, String subject, String title, String content);
 }
