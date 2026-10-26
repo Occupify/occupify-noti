@@ -16,6 +16,11 @@ spring:
         auto-startup: false
 
 app:
+  auth:
+    dev-mock:
+      enabled: false
+      user-id: 00000000-0000-0000-0000-000000000001
+      user-email: dev-employer@occupify.local
   rabbitmq:
     exchange: occupify.notification.exchange
     queue: occupify.notification.queue
@@ -25,3 +30,7 @@ app:
     dlq-routing-key: notification.dlq
     user-queue: occupify.notification.user.queue
     user-routing-key: user.#
+    project-queue: occupify.notification.project.queue
+    project-routing-key: project.#
+    bid-queue: occupify.notification.bid.queue
+    bid-routing-key: bid.#
