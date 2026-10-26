@@ -59,4 +59,27 @@ class RabbitMQConfigTest {
         assertEquals("reset@occupify.com", event.email());
         assertEquals("654321", event.otpCode());
     }
+
+    @Test
+    @DisplayName("Should deserialize UserActivatedEvent published from identity service")
+    void shouldDeserializeIdentityUserActivatedEvent() {
+        UUID userId = UUID.randomUUID();
+        String json = String.format("{\"userId\":\"%s\",\"email\":\"active@occupify.com\",\"fullName\":\"Active User\",\"role\":\"USER\",\"status\":\"ACTIVE\",\"occurredAt\":\"2026-10-07T03:00:00Z\"}", userId);
+
+        MessageProperties properties = new MessageProperties();
+        properties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
+        properties.setHeader("__TypeId__", "com.occupify.identity.event.UserActivatedEvent");
+
+        Message message = new Message(json.getBytes(StandardCharsets.UTF_8), properties);
+
+        Object result = converter.fromMessage(message);
+
+        assertInstanceOf(com.occupify.notification.dto.event.UserActivatedEvent.class, result);
+        com.occupify.notification.dto.event.UserActivatedEvent event = (com.occupify.notification.dto.event.UserActivatedEvent) result;
+        assertEquals(userId, event.userId());
+        assertEquals("active@occupify.com", event.email());
+        assertEquals("Active User", event.fullName());
+        assertEquals("USER", event.role());
+        assertEquals("ACTIVE", event.status());
+    }
 }

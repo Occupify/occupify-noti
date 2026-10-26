@@ -2,6 +2,9 @@ package com.occupify.notification.service.impl;
 
 import com.occupify.notification.dto.base.PageResponse;
 import com.occupify.notification.dto.event.*;
+import com.occupify.notification.dto.event.NotificationEventPayload;
+import com.occupify.notification.dto.event.UserActivatedEvent;
+import com.occupify.notification.dto.event.UserRegisteredEvent;
 import com.occupify.notification.dto.response.NotificationResponse;
 import com.occupify.notification.entity.Notification;
 import com.occupify.notification.entity.User;
@@ -184,6 +187,12 @@ public class NotificationServiceImpl implements NotificationService {
         if (recipientEmail != null && !recipientEmail.isBlank()) {
             emailService.sendNotificationEmail(recipientEmail, "Occupify - " + title, title, content);
         }
+    }
+
+    public void processUserActivatedEvent(UserActivatedEvent event) {
+        log.info("[Notification Service] Processing user activated event for user [{}] ({})",
+                event.userId(), event.email());
+        getOrCreateUser(event.userId(), event.email(), event.fullName(), null);
     }
 
     private Notification processNotification(UUID userId, String title, String content, NotificationTemplate template) {

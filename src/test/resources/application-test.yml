@@ -28,6 +28,7 @@ app:
     dlx-exchange: occupify.notification.dlx
     dlq-queue: occupify.notification.dlq
     dlq-routing-key: notification.dlq
+    user-exchange: occupify.user.exchange
     user-queue: occupify.notification.user.queue
     user-routing-key: user.#
     project-queue: occupify.notification.project.queue

@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public enum NotificationTemplate {
     PROPOSAL_VIEWED("Đề xuất đã được xem", "Nhà tuyển dụng %s đã xem đề xuất của bạn cho công việc '%s'.", NotificationCategory.JOB),
     PROPOSAL_SUBMITTED("Đề xuất ứng tuyển mới", "Ứng viên %s vừa gửi đề xuất cho công việc '%s'.", NotificationCategory.JOB),
@@ -20,6 +19,12 @@ public enum NotificationTemplate {
     private final String title;
     private final String contentTemplate;
     private final NotificationCategory category;
+
+    NotificationTemplate(String title, String contentTemplate, NotificationCategory category) {
+        this.title = title;
+        this.contentTemplate = contentTemplate;
+        this.category = category;
+    }
 
     public String formatContent(Object... args) {
         return String.format(this.contentTemplate, args);

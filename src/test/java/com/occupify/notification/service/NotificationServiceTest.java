@@ -170,4 +170,17 @@ class NotificationServiceTest {
 
         verify(userRepository).findById(userId);
     }
+
+    @Test
+    @DisplayName("Should process user activated event and sync user")
+    void shouldProcessUserActivatedEvent() {
+        com.occupify.notification.dto.event.UserActivatedEvent event =
+                new com.occupify.notification.dto.event.UserActivatedEvent(userId, "active@occupify.com", "Active User", "USER", "ACTIVE", java.time.Instant.now());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+
+        notificationService.processUserActivatedEvent(event);
+
+        verify(userRepository).findById(userId);
+    }
 }
