@@ -15,8 +15,6 @@ import java.time.LocalDateTime;
 })
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Notification extends AbstractBaseEntity {
 
@@ -44,4 +42,18 @@ public class Notification extends AbstractBaseEntity {
 
     @Column(name = "read_at")
     private LocalDateTime readAt;
+
+    public Notification() {
+    }
+
+    public Notification(User user, NotificationCategory category, NotificationTemplate actionType,
+                        String title, String content, Boolean isRead, LocalDateTime readAt) {
+        this.user = user;
+        this.category = category;
+        this.actionType = actionType;
+        this.title = title;
+        this.content = content;
+        this.isRead = isRead != null ? isRead : false;
+        this.readAt = readAt;
+    }
 }
