@@ -10,6 +10,7 @@ spring:
       static-locations: classpath:/static/
   config:
     import:
+      - optional:file:core.env[.properties]
       - optional:file:.env[.properties]
       - optional:file:../.env[.properties]
   datasource:
@@ -68,6 +69,10 @@ app:
     dlq-routing-key: ${NOTIFICATION_DLQ_ROUTING_KEY:notification.dlq}
     user-queue: ${USER_QUEUE:occupify.notification.user.queue}
     user-routing-key: ${USER_ROUTING_KEY:user.#}
+    project-queue: ${PROJECT_QUEUE:occupify.notification.project.queue}
+    project-routing-key: ${PROJECT_ROUTING_KEY:project.#}
+    bid-queue: ${BID_QUEUE:occupify.notification.bid.queue}
+    bid-routing-key: ${BID_ROUTING_KEY:bid.#}
 
 
 management:
