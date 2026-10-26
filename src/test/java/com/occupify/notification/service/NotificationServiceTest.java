@@ -10,6 +10,7 @@ import com.occupify.notification.enums.NotificationTemplate;
 import com.occupify.notification.mapper.NotificationMapper;
 import com.occupify.notification.repository.NotificationRepository;
 import com.occupify.notification.repository.UserRepository;
+import com.occupify.notification.service.EmailService;
 import com.occupify.notification.service.impl.NotificationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,9 @@ class NotificationServiceTest {
 
     @Mock
     private NotificationStreamService streamService;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private NotificationServiceImpl notificationService;

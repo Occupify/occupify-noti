@@ -1,8 +1,7 @@
 package com.occupify.notification.service.impl;
 
 import com.occupify.notification.dto.base.PageResponse;
-import com.occupify.notification.dto.event.NotificationEventPayload;
-import com.occupify.notification.dto.event.UserRegisteredEvent;
+import com.occupify.notification.dto.event.*;
 import com.occupify.notification.dto.response.NotificationResponse;
 import com.occupify.notification.entity.Notification;
 import com.occupify.notification.entity.User;
@@ -13,6 +12,7 @@ import com.occupify.notification.exception.NotificationException;
 import com.occupify.notification.mapper.NotificationMapper;
 import com.occupify.notification.repository.NotificationRepository;
 import com.occupify.notification.repository.UserRepository;
+import com.occupify.notification.service.EmailService;
 import com.occupify.notification.service.NotificationService;
 import com.occupify.notification.service.NotificationStreamService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
     private final NotificationStreamService notificationStreamService;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -115,6 +116,74 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("[Notification Service] Processing user registered event for user [{}] ({})",
                 event.userId(), event.email());
         getOrCreateUser(event.userId(), event.email(), null, null);
+    }
+
+    @Override
+    @Transactional
+    public void processProjectCreatedEvent(ProjectCreatedEvent event) {
+        log.info("[Notification Service] Processing project created event for project [{}] ('{}'), employer [{}]",
+                event.projectId(), event.title(), event.employerId());
+        NotificationTemplate template = NotificationTemplate.PROJECT_CREATED;
+        String title = template.getTitle();
+        String content = template.formatContent(event.title());
+        processNotification(event.employerId(), title, content, template, event.employerEmail(), null, null);
+
+        String recipientEmail = (event.employerEmail() != null && !event.employerEmail().isBlank())
+                ? event.employerEmail()
+                : userRepository.findById(event.employerId()).map(User::getEmail).orElse(null);
+        if (recipientEmail != null && !recipientEmail.isBlank()) {
+            emailService.sendNotificationEmail(recipientEmail, "Occupify - " + title, title, content);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void processProjectClosedEvent(ProjectClosedEvent event) {
+        log.info("[Notification Service] Processing project closed event for project [{}] ('{}'), employer [{}]",
+                event.projectId(), event.title(), event.employerId());
+        NotificationTemplate template = NotificationTemplate.PROJECT_CLOSED;
+        String title = template.getTitle();
+        String content = template.formatContent(event.title());
+        processNotification(event.employerId(), title, content, template, event.employerEmail(), null, null);
+
+        String recipientEmail = (event.employerEmail() != null && !event.employerEmail().isBlank())
+                ? event.employerEmail()
+                : userRepository.findById(event.employerId()).map(User::getEmail).orElse(null);
+        if (recipientEmail != null && !recipientEmail.isBlank()) {
+            emailService.sendNotificationEmail(recipientEmail, "Occupify - " + title, title, content);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void processBidCreatedEvent(BidCreatedEvent event) {
+        log.info("[Notification Service] Processing bid created event for bid [{}], job ['{}'], employer [{}]",
+                event.bidId(), event.jobTitle(), event.employerId());
+        NotificationTemplate template = NotificationTemplate.PROPOSAL_SUBMITTED;
+        String title = template.getTitle();
+        String content = template.formatContent(event.freelancerName(), event.jobTitle());
+        processNotification(event.employerId(), title, content, template, null, null, null);
+
+        String recipientEmail = userRepository.findById(event.employerId()).map(User::getEmail).orElse(null);
+        if (recipientEmail != null && !recipientEmail.isBlank()) {
+            emailService.sendNotificationEmail(recipientEmail, "Occupify - " + title, title, content);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void processBidCancelledEvent(BidCancelledEvent event) {
+        log.info("[Notification Service] Processing bid cancelled event for bid [{}], employer [{}]",
+                event.bidId(), event.employerId());
+        NotificationTemplate template = NotificationTemplate.PROPOSAL_CANCELLED;
+        String title = template.getTitle();
+        String content = template.getContentTemplate();
+        processNotification(event.employerId(), title, content, template, null, null, null);
+
+        String recipientEmail = userRepository.findById(event.employerId()).map(User::getEmail).orElse(null);
+        if (recipientEmail != null && !recipientEmail.isBlank()) {
+            emailService.sendNotificationEmail(recipientEmail, "Occupify - " + title, title, content);
+        }
     }
 
     private Notification processNotification(UUID userId, String title, String content, NotificationTemplate template) {

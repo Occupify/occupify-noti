@@ -1,8 +1,7 @@
 package com.occupify.notification.service;
 
 import com.occupify.notification.dto.base.PageResponse;
-import com.occupify.notification.dto.event.NotificationEventPayload;
-import com.occupify.notification.dto.event.UserRegisteredEvent;
+import com.occupify.notification.dto.event.*;
 import com.occupify.notification.dto.response.NotificationResponse;
 
 import java.util.UUID;
@@ -26,6 +25,14 @@ public interface NotificationService {
     NotificationResponse processNotificationEvent(NotificationEventPayload event);
 
     void processUserRegisteredEvent(UserRegisteredEvent event);
+
+    void processProjectCreatedEvent(ProjectCreatedEvent event);
+
+    void processProjectClosedEvent(ProjectClosedEvent event);
+
+    void processBidCreatedEvent(BidCreatedEvent event);
+
+    void processBidCancelledEvent(BidCancelledEvent event);
 
     PageResponse<NotificationResponse> getNotifications(UUID userId, int page, int limit);
 
