@@ -24,7 +24,7 @@ public class ContractEventListener {
 
     @RabbitHandler
     public void handleContractCreated(ContractCreatedEvent event) {
-        log.info("[Noti Saga] Processing ContractCreatedEvent for contractId: {}, freelancerEmail: {}",
+        log.info("[Notification Contract Listener] Processing ContractCreatedEvent for contractId: {}, freelancerEmail: {}",
                 event.contractId(), event.freelancerEmail());
 
         String employerName = (event.employerName() != null && !event.employerName().isBlank())
@@ -66,7 +66,7 @@ public class ContractEventListener {
 
     @RabbitHandler
     public void handleContractAccepted(ContractAcceptedEvent event) {
-        log.info("[Noti Saga] Processing ContractAcceptedEvent for contractId: {}, employerId: {}",
+        log.info("[Notification Contract Listener] Processing ContractAcceptedEvent for contractId: {}, employerId: {}",
                 event.contractId(), event.employerId());
         String freelancerName = (event.freelancerName() != null && !event.freelancerName().isBlank())
                 ? event.freelancerName()
@@ -88,7 +88,7 @@ public class ContractEventListener {
 
     @RabbitHandler
     public void handleContractRejected(ContractRejectedEvent event) {
-        log.info("[Noti Saga] Processing ContractRejectedEvent for contractId: {}, employerId: {}",
+        log.info("[Notification Contract Listener] Processing ContractRejectedEvent for contractId: {}, employerId: {}",
                 event.contractId(), event.employerId());
         String freelancerName = (event.freelancerName() != null && !event.freelancerName().isBlank())
                 ? event.freelancerName()
@@ -114,7 +114,7 @@ public class ContractEventListener {
 
     @RabbitHandler
     public void handleContractCompensation(ContractCompensationRequestedEvent event) {
-        log.warn("[Noti Saga] Processing ContractCompensationRequestedEvent for contractId: {}, reason: {}",
+        log.warn("[Notification Contract Listener] Processing ContractCompensationRequestedEvent for contractId: {}, reason: {}",
                 event.contractId(), event.reason());
         notificationService.createContractCompensatedNotification(event.contractId(), event.reason());
     }
