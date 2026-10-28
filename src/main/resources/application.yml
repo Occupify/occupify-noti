@@ -69,6 +69,11 @@ app:
     user-exchange: ${USER_EXCHANGE:occupify.user.exchange}
     user-queue: ${USER_QUEUE:occupify.notification.user.queue}
     user-routing-key: ${USER_ROUTING_KEY:user.#}
+    contract-exchange: ${CONTRACT_EXCHANGE:occupify.contract.exchange}
+    contract-queue: ${CONTRACT_QUEUE:occupify.notification.contract.queue}
+    contract-accepted-routing-key: ${CONTRACT_ACCEPTED_ROUTING_KEY:contract.accepted}
+    contract-rejected-routing-key: ${CONTRACT_REJECTED_ROUTING_KEY:contract.rejected}
+    contract-compensation-routing-key: ${CONTRACT_COMPENSATION_ROUTING_KEY:contract.compensation.#}
 
 
 management:

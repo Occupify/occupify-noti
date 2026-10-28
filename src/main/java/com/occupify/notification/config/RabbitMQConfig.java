@@ -44,6 +44,59 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.user-routing-key:user.#}")
     private String userRoutingKey;
 
+    @Value("${app.rabbitmq.contract-exchange:occupify.contract.exchange}")
+    private String contractExchangeName;
+
+    @Value("${app.rabbitmq.contract-queue:occupify.notification.contract.queue}")
+    private String contractQueueName;
+
+    @Value("${app.rabbitmq.contract-created-routing-key:contract.created}")
+    private String contractCreatedRoutingKey;
+
+    @Value("${app.rabbitmq.contract-accepted-routing-key:contract.accepted}")
+    private String contractAcceptedRoutingKey;
+
+    @Value("${app.rabbitmq.contract-rejected-routing-key:contract.rejected}")
+    private String contractRejectedRoutingKey;
+
+    @Value("${app.rabbitmq.contract-compensation-routing-key:contract.compensation.#}")
+    private String contractCompensationRoutingKey;
+
+    @Bean
+    public TopicExchange contractExchange() {
+        return new TopicExchange(contractExchangeName, true, false);
+    }
+
+    @Bean
+    public Queue notiContractQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", dlxExchangeName);
+        args.put("x-dead-letter-routing-key", dlqRoutingKey);
+        return QueueBuilder.durable(contractQueueName)
+                .withArguments(args)
+                .build();
+    }
+
+    @Bean
+    public Binding notiContractCreatedBinding(Queue notiContractQueue, TopicExchange contractExchange) {
+        return BindingBuilder.bind(notiContractQueue).to(contractExchange).with(contractCreatedRoutingKey);
+    }
+
+    @Bean
+    public Binding notiContractAcceptedBinding(Queue notiContractQueue, TopicExchange contractExchange) {
+        return BindingBuilder.bind(notiContractQueue).to(contractExchange).with(contractAcceptedRoutingKey);
+    }
+
+    @Bean
+    public Binding notiContractRejectedBinding(Queue notiContractQueue, TopicExchange contractExchange) {
+        return BindingBuilder.bind(notiContractQueue).to(contractExchange).with(contractRejectedRoutingKey);
+    }
+
+    @Bean
+    public Binding notiContractCompensationBinding(Queue notiContractQueue, TopicExchange contractExchange) {
+        return BindingBuilder.bind(notiContractQueue).to(contractExchange).with(contractCompensationRoutingKey);
+    }
+
     @Bean
     public TopicExchange notificationExchange() {
         return new TopicExchange(exchangeName, true, false);
@@ -116,6 +169,7 @@ public class RabbitMQConfig {
     public MessageConverter jackson2JsonMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
         org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper typeMapper =
                 new org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper();
@@ -134,6 +188,23 @@ public class RabbitMQConfig {
         idClassMapping.put("UserActivatedEvent", com.occupify.notification.dto.event.UserActivatedEvent.class);
         idClassMapping.put("PasswordResetRequestedEvent", com.occupify.notification.dto.event.PasswordResetRequestedEvent.class);
         idClassMapping.put("NotificationEventPayload", com.occupify.notification.dto.event.NotificationEventPayload.class);
+
+        idClassMapping.put("com.occupify.core.event.ContractCreatedEvent", com.occupify.notification.dto.event.ContractCreatedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ContractCreatedEvent", com.occupify.notification.dto.event.ContractCreatedEvent.class);
+        idClassMapping.put("ContractCreatedEvent", com.occupify.notification.dto.event.ContractCreatedEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.ContractAcceptedEvent", com.occupify.notification.dto.event.ContractAcceptedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ContractAcceptedEvent", com.occupify.notification.dto.event.ContractAcceptedEvent.class);
+        idClassMapping.put("ContractAcceptedEvent", com.occupify.notification.dto.event.ContractAcceptedEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.ContractRejectedEvent", com.occupify.notification.dto.event.ContractRejectedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ContractRejectedEvent", com.occupify.notification.dto.event.ContractRejectedEvent.class);
+        idClassMapping.put("ContractRejectedEvent", com.occupify.notification.dto.event.ContractRejectedEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.ContractCompensationRequestedEvent", com.occupify.notification.dto.event.ContractCompensationRequestedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ContractCompensationRequestedEvent", com.occupify.notification.dto.event.ContractCompensationRequestedEvent.class);
+        idClassMapping.put("ContractCompensationRequestedEvent", com.occupify.notification.dto.event.ContractCompensationRequestedEvent.class);
+
         typeMapper.setIdClassMapping(idClassMapping);
 
         converter.setJavaTypeMapper(typeMapper);

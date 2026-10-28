@@ -11,7 +11,11 @@ public enum NotificationTemplate {
     POST_LIKED("Tương tác mới", "%s đã thích bài viết '%s' của bạn.", NotificationCategory.JOB),
     POST_COMMENTED("Bình luận mới", "%s đã bình luận về bài viết '%s' của bạn: \"%s\"", NotificationCategory.JOB),
     POST_SHARED("Chia sẻ mới", "%s đã chia sẻ bài viết '%s' của bạn.", NotificationCategory.JOB),
-    JOB_MATCH_POSTED("Công việc phù hợp mới", "Có công việc mới phù hợp với kỹ năng của bạn: '%s' (Ngân sách: %s).", NotificationCategory.JOB);
+    JOB_MATCH_POSTED("Công việc phù hợp mới", "Có công việc mới phù hợp với kỹ năng của bạn: '%s' (Ngân sách: %s).", NotificationCategory.JOB),
+    CONTRACT_INVITATION("Lời mời tham gia hợp đồng", "Bạn có một lời mời tham gia hợp đồng từ %s cho công việc '%s'.", NotificationCategory.CONTRACT),
+    CONTRACT_ACCEPTED("Hợp đồng đã được chấp nhận", "Ứng viên đã chấp nhận hợp đồng cho công việc '%s'.", NotificationCategory.CONTRACT),
+    CONTRACT_REJECTED("Hợp đồng bị từ chối", "Ứng viên đã từ chối hợp đồng cho công việc '%s'. Lý do: %s", NotificationCategory.CONTRACT),
+    CONTRACT_COMPENSATED("Kích hoạt hợp đồng thất bại", "Hợp đồng cho công việc '%s' không thể kích hoạt do sự cố hệ thống. Lý do: %s", NotificationCategory.CONTRACT);
 
     private final String title;
     private final String contentTemplate;
