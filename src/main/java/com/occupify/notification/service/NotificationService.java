@@ -25,6 +25,18 @@ public interface NotificationService {
 
     void createJobMatchPostedNotification(UUID userId, String jobTitle, String budget);
 
+    void createContractInvitationNotification(UUID userId, String email, String employerName, String jobTitle, String message, String details);
+
+    void createContractAcceptedNotification(UUID employerId, String jobTitle);
+
+    void createContractAcceptedNotification(UUID employerId, String employerEmail, String freelancerName, String jobTitle);
+
+    void createContractRejectedNotification(UUID employerId, String reason);
+
+    void createContractRejectedNotification(UUID employerId, String employerEmail, String freelancerName, String jobTitle, String reason);
+
+    void createContractCompensatedNotification(UUID employerId, String reason);
+
     NotificationResponse processNotificationEvent(NotificationEventPayload event);
 
     void processUserRegisteredEvent(UserRegisteredEvent event);
@@ -36,7 +48,6 @@ public interface NotificationService {
     void processBidCreatedEvent(BidCreatedEvent event);
 
     void processBidCancelledEvent(BidCancelledEvent event);
-
     void processUserActivatedEvent(UserActivatedEvent event);
 
     PageResponse<NotificationResponse> getNotifications(UUID userId, int page, int limit);

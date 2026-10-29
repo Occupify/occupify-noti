@@ -37,4 +37,5 @@ build/
 
 ### Environment files ###
 *.env
+noti.env
 !.env.example

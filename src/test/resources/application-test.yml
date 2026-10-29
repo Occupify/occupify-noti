@@ -31,6 +31,11 @@ app:
     user-exchange: occupify.user.exchange
     user-queue: occupify.notification.user.queue
     user-routing-key: user.#
+    contract-exchange: occupify.contract.exchange
+    contract-queue: occupify.notification.contract.queue
+    contract-accepted-routing-key: contract.accepted
+    contract-rejected-routing-key: contract.rejected
+    contract-compensation-routing-key: contract.compensation.#
     project-queue: occupify.notification.project.queue
     project-routing-key: project.#
     bid-queue: occupify.notification.bid.queue

@@ -91,6 +91,69 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
+    public void createContractInvitationNotification(UUID userId, String email, String employerName, String jobTitle, String message, String details) {
+        NotificationTemplate template = NotificationTemplate.CONTRACT_INVITATION;
+        String title = "Bạn có một lời mời tham gia hợp đồng từ " + (employerName != null ? employerName : "Nhà tuyển dụng");
+        StringBuilder sb = new StringBuilder();
+        if (jobTitle != null && !jobTitle.isBlank()) {
+            sb.append("Công việc: ").append(jobTitle).append(". ");
+        }
+        if (message != null && !message.isBlank()) {
+            sb.append("Tin nhắn: ").append(message).append(". ");
+        }
+        if (details != null && !details.isBlank()) {
+            sb.append("Chi tiết: ").append(details);
+        }
+        String content = sb.toString().trim();
+        processNotification(userId, title, content, template, email, null, null);
+    }
+
+    @Override
+    @Transactional
+    public void createContractAcceptedNotification(UUID employerId, String jobTitle) {
+        createContractAcceptedNotification(employerId, null, null, jobTitle);
+    }
+
+    @Override
+    @Transactional
+    public void createContractAcceptedNotification(UUID employerId, String employerEmail, String freelancerName, String jobTitle) {
+        NotificationTemplate template = NotificationTemplate.CONTRACT_ACCEPTED;
+        String title = template.getTitle();
+        String candidate = (freelancerName != null && !freelancerName.isBlank()) ? freelancerName : "Ứng viên";
+        String job = (jobTitle != null && !jobTitle.isBlank()) ? jobTitle : "công việc";
+        String content = String.format("%s đã chấp nhận hợp đồng cho công việc '%s'.", candidate, job);
+        processNotification(employerId, title, content, template, employerEmail, null, null);
+    }
+
+    @Override
+    @Transactional
+    public void createContractRejectedNotification(UUID employerId, String reason) {
+        createContractRejectedNotification(employerId, null, null, null, reason);
+    }
+
+    @Override
+    @Transactional
+    public void createContractRejectedNotification(UUID employerId, String employerEmail, String freelancerName, String jobTitle, String reason) {
+        NotificationTemplate template = NotificationTemplate.CONTRACT_REJECTED;
+        String title = template.getTitle();
+        String candidate = (freelancerName != null && !freelancerName.isBlank()) ? freelancerName : "Ứng viên";
+        String job = (jobTitle != null && !jobTitle.isBlank()) ? jobTitle : "công việc";
+        String reasonText = (reason != null && !reason.isBlank()) ? reason : "Không có lý do";
+        String content = String.format("%s đã từ chối hợp đồng cho công việc '%s'. Lý do: %s", candidate, job, reasonText);
+        processNotification(employerId, title, content, template, employerEmail, null, null);
+    }
+
+    @Override
+    @Transactional
+    public void createContractCompensatedNotification(UUID employerId, String reason) {
+        NotificationTemplate template = NotificationTemplate.CONTRACT_COMPENSATED;
+        String title = template.getTitle();
+        String content = template.formatContent("hợp đồng", reason != null ? reason : "Lỗi xử lý thanh toán");
+        processNotification(employerId, title, content, template);
+    }
+
+    @Override
+    @Transactional
     public NotificationResponse processNotificationEvent(NotificationEventPayload event) {
         NotificationTemplate template = event.actionType();
         String title = (event.customTitle() != null && !event.customTitle().isBlank())
@@ -188,7 +251,6 @@ public class NotificationServiceImpl implements NotificationService {
             emailService.sendNotificationEmail(recipientEmail, "Occupify - " + title, title, content);
         }
     }
-
     public void processUserActivatedEvent(UserActivatedEvent event) {
         log.info("[Notification Service] Processing user activated event for user [{}] ({})",
                 event.userId(), event.email());
