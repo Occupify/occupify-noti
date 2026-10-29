@@ -50,6 +50,43 @@ public class EmailServiceImpl implements EmailService {
         );
     }
 
+    @Override
+    @Async
+    public void sendNotificationEmail(String recipientEmail, String subject, String title, String content) {
+        if (recipientEmail == null || recipientEmail.isBlank()) {
+            log.warn("[Email Service] Cannot send email: recipient email is null or empty");
+            return;
+        }
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, StandardCharsets.UTF_8.name());
+            String from = (fromEmail != null && !fromEmail.isBlank()) ? fromEmail : "no-reply@occupify.com";
+            helper.setFrom(from);
+            helper.setTo(recipientEmail);
+            helper.setSubject(subject);
+
+            String htmlContent = loadNotificationTemplate(title, content);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("[Email Service] Successfully dispatched notification email to [{}]", recipientEmail);
+        } catch (Exception ex) {
+            log.error("[Email Service] Failed to dispatch notification email to [{}]: {}", recipientEmail, ex.getMessage());
+        }
+    }
+
+    private String loadNotificationTemplate(String title, String content) {
+        try {
+            return new ClassPathResource("templates/email/notification.html")
+                    .getContentAsString(StandardCharsets.UTF_8)
+                    .replace("{{title}}", title != null ? title : "Thông báo mới")
+                    .replace("{{content}}", content != null ? content : "");
+        } catch (Exception e) {
+            log.warn("[Email Service] Failed to load notification email template, using fallback: {}", e.getMessage());
+            return "<h3>" + title + "</h3><p>" + content + "</p>";
+        }
+    }
+
     private void sendHtmlEmail(String recipientEmail, String subject, String templatePath, String otpCode, String actionDescription) {
         if (recipientEmail == null || recipientEmail.isBlank()) {
             log.warn("[Email Service] Cannot send email: recipient email is null or empty");

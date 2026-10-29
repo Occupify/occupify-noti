@@ -36,6 +36,5 @@ build/
 *.tmp
 
 ### Environment files ###
-noti.env
+*.env
 !.env.example
-

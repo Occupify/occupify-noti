@@ -1,6 +1,7 @@
 package com.occupify.notification.service;
 
 import com.occupify.notification.dto.base.PageResponse;
+import com.occupify.notification.dto.event.*;
 import com.occupify.notification.dto.event.NotificationEventPayload;
 import com.occupify.notification.dto.event.UserActivatedEvent;
 import com.occupify.notification.dto.event.UserRegisteredEvent;
@@ -27,6 +28,14 @@ public interface NotificationService {
     NotificationResponse processNotificationEvent(NotificationEventPayload event);
 
     void processUserRegisteredEvent(UserRegisteredEvent event);
+
+    void processProjectCreatedEvent(ProjectCreatedEvent event);
+
+    void processProjectClosedEvent(ProjectClosedEvent event);
+
+    void processBidCreatedEvent(BidCreatedEvent event);
+
+    void processBidCancelledEvent(BidCancelledEvent event);
 
     void processUserActivatedEvent(UserActivatedEvent event);
 
