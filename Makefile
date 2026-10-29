@@ -10,4 +10,4 @@ up: infra
 	@./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
 down: 
-	@$(COMPOSE) $(ENV_FILE) down
+	@$(COMPOSE) $(ENV_FILE) down -v

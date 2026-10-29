@@ -32,4 +32,6 @@ public interface EmailService {
             String freelancerName,
             String jobTitle,
             String reason);
+
+    void sendNotificationEmail(String recipientEmail, String subject, String title, String content);
 }

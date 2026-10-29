@@ -8,6 +8,7 @@ import com.occupify.notification.dto.response.NotificationResponse;
 import com.occupify.notification.enums.NotificationCategory;
 import com.occupify.notification.enums.NotificationTemplate;
 import com.occupify.notification.config.ScalarConfig;
+import com.occupify.notification.repository.UserRepository;
 import com.occupify.notification.service.NotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ class NotificationControllerTest {
 
     @MockBean
     private NotificationService notificationService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     @DisplayName("GET /api/v1/notifications should return paginated notifications")

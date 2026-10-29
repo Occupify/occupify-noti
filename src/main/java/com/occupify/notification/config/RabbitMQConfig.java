@@ -62,6 +62,18 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.contract-compensation-routing-key:contract.compensation.#}")
     private String contractCompensationRoutingKey;
 
+    @Value("${app.rabbitmq.project-queue:occupify.notification.project.queue}")
+    private String projectQueueName;
+
+    @Value("${app.rabbitmq.project-routing-key:project.#}")
+    private String projectRoutingKey;
+
+    @Value("${app.rabbitmq.bid-queue:occupify.notification.bid.queue}")
+    private String bidQueueName;
+
+    @Value("${app.rabbitmq.bid-routing-key:bid.#}")
+    private String bidRoutingKey;
+
     @Bean
     public TopicExchange contractExchange() {
         return new TopicExchange(contractExchangeName, true, false);
@@ -154,6 +166,40 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue projectQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", dlxExchangeName);
+        args.put("x-dead-letter-routing-key", dlqRoutingKey);
+        return QueueBuilder.durable(projectQueueName)
+                .withArguments(args)
+                .build();
+    }
+
+    @Bean
+    public Binding projectBinding(Queue projectQueue, TopicExchange notificationExchange) {
+        return BindingBuilder.bind(projectQueue)
+                .to(notificationExchange)
+                .with(projectRoutingKey);
+    }
+
+    @Bean
+    public Queue bidQueue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", dlxExchangeName);
+        args.put("x-dead-letter-routing-key", dlqRoutingKey);
+        return QueueBuilder.durable(bidQueueName)
+                .withArguments(args)
+                .build();
+    }
+
+    @Bean
+    public Binding bidBinding(Queue bidQueue, TopicExchange notificationExchange) {
+        return BindingBuilder.bind(bidQueue)
+                .to(notificationExchange)
+                .with(bidRoutingKey);
+    }
+
+    @Bean
     public TopicExchange userExchange() {
         return new TopicExchange(userExchangeName, true, false);
     }
@@ -205,6 +251,21 @@ public class RabbitMQConfig {
         idClassMapping.put("com.occupify.notification.dto.event.ContractCompensationRequestedEvent", com.occupify.notification.dto.event.ContractCompensationRequestedEvent.class);
         idClassMapping.put("ContractCompensationRequestedEvent", com.occupify.notification.dto.event.ContractCompensationRequestedEvent.class);
 
+        idClassMapping.put("com.occupify.core.event.ProjectCreatedEvent", com.occupify.notification.dto.event.ProjectCreatedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ProjectCreatedEvent", com.occupify.notification.dto.event.ProjectCreatedEvent.class);
+        idClassMapping.put("ProjectCreatedEvent", com.occupify.notification.dto.event.ProjectCreatedEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.ProjectClosedEvent", com.occupify.notification.dto.event.ProjectClosedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ProjectClosedEvent", com.occupify.notification.dto.event.ProjectClosedEvent.class);
+        idClassMapping.put("ProjectClosedEvent", com.occupify.notification.dto.event.ProjectClosedEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.BidCreatedEvent", com.occupify.notification.dto.event.BidCreatedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.BidCreatedEvent", com.occupify.notification.dto.event.BidCreatedEvent.class);
+        idClassMapping.put("BidCreatedEvent", com.occupify.notification.dto.event.BidCreatedEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.BidCancelledEvent", com.occupify.notification.dto.event.BidCancelledEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.BidCancelledEvent", com.occupify.notification.dto.event.BidCancelledEvent.class);
+        idClassMapping.put("BidCancelledEvent", com.occupify.notification.dto.event.BidCancelledEvent.class);
         typeMapper.setIdClassMapping(idClassMapping);
 
         converter.setJavaTypeMapper(typeMapper);

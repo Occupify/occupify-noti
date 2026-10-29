@@ -60,6 +60,19 @@ class EmailServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should send notification email successfully")
+    void shouldSendNotificationEmailSuccessfully() throws Exception {
+        MimeMessage mimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        emailService.sendNotificationEmail("user@occupify.com", "Occupify - Dự án đã được tạo", "Dự án đã được tạo", "Dự án của bạn đã được tạo thành công.");
+
+        verify(mailSender).send(mimeMessage);
+        assertEquals("Occupify - Dự án đã được tạo", mimeMessage.getSubject());
+        assertEquals("user@occupify.com", mimeMessage.getAllRecipients()[0].toString());
+    }
+
+    @Test
     @DisplayName("Should not send email when recipient is null or blank")
     void shouldNotSendEmailWhenRecipientBlank() {
         emailService.sendRegistrationOtp(null, "123456");

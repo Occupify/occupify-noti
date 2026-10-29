@@ -15,7 +15,10 @@ public enum NotificationTemplate {
     CONTRACT_INVITATION("Lời mời tham gia hợp đồng", "Bạn có một lời mời tham gia hợp đồng từ %s cho công việc '%s'.", NotificationCategory.CONTRACT),
     CONTRACT_ACCEPTED("Hợp đồng đã được chấp nhận", "Ứng viên đã chấp nhận hợp đồng cho công việc '%s'.", NotificationCategory.CONTRACT),
     CONTRACT_REJECTED("Hợp đồng bị từ chối", "Ứng viên đã từ chối hợp đồng cho công việc '%s'. Lý do: %s", NotificationCategory.CONTRACT),
-    CONTRACT_COMPENSATED("Kích hoạt hợp đồng thất bại", "Hợp đồng cho công việc '%s' không thể kích hoạt do sự cố hệ thống. Lý do: %s", NotificationCategory.CONTRACT);
+    CONTRACT_COMPENSATED("Kích hoạt hợp đồng thất bại", "Hợp đồng cho công việc '%s' không thể kích hoạt do sự cố hệ thống. Lý do: %s", NotificationCategory.CONTRACT),
+    PROJECT_CREATED("Dự án đã được tạo", "Dự án '%s' của bạn đã được đăng thành công.", NotificationCategory.PROJECT),
+    PROJECT_CLOSED("Dự án đã đóng", "Dự án '%s' của bạn đã được đóng.", NotificationCategory.PROJECT),
+    PROPOSAL_CANCELLED("Đề xuất đã bị hủy", "Một đề xuất ứng tuyển cho dự án của bạn đã bị hủy.", NotificationCategory.JOB);
 
     private final String title;
     private final String contentTemplate;

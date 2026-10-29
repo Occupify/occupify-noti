@@ -20,7 +20,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    locations: classpath:db/migration
+    locations: classpath:db/migration,classpath:db/seed
   jpa:
     hibernate:
       ddl-auto: update
@@ -59,6 +59,12 @@ spring:
 app:
   otp:
     expiration-minutes: ${OTP_EXPIRATION_MINUTES:5}
+  auth:
+    dev-mock:
+      enabled: ${DEV_MOCK_AUTH_ENABLED:false}
+      user-id: 00000000-0000-0000-0000-000000000001
+      user-role: USER
+      user-email: dev-employer@occupify.local
   rabbitmq:
     exchange: ${NOTIFICATION_EXCHANGE:occupify.notification.exchange}
     queue: ${NOTIFICATION_QUEUE:occupify.notification.queue}
@@ -74,6 +80,10 @@ app:
     contract-accepted-routing-key: ${CONTRACT_ACCEPTED_ROUTING_KEY:contract.accepted}
     contract-rejected-routing-key: ${CONTRACT_REJECTED_ROUTING_KEY:contract.rejected}
     contract-compensation-routing-key: ${CONTRACT_COMPENSATION_ROUTING_KEY:contract.compensation.#}
+    project-queue: ${PROJECT_QUEUE:occupify.notification.project.queue}
+    project-routing-key: ${PROJECT_ROUTING_KEY:project.#}
+    bid-queue: ${BID_QUEUE:occupify.notification.bid.queue}
+    bid-routing-key: ${BID_ROUTING_KEY:bid.#}
 
 
 management:
@@ -93,5 +103,6 @@ scalar:
 springdoc:
   api-docs:
     path: /v3/api-docs
-  swagger-ui:
     enabled: true
+  swagger-ui:
+    enabled: false
