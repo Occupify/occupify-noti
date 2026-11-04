@@ -164,6 +164,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
+    public void createContractCancelledNotification(UUID userId, String userEmail, String cancelledByRoleOrName, String jobTitle, String reason) {
+        NotificationTemplate template = NotificationTemplate.CONTRACT_CANCELLED;
+        String title = template.getTitle();
+        String job = (jobTitle != null && !jobTitle.isBlank()) ? jobTitle : "công việc";
+        String cancelledBy = (cancelledByRoleOrName != null && !cancelledByRoleOrName.isBlank()) ? cancelledByRoleOrName : "Đối tác";
+        String reasonText = (reason != null && !reason.isBlank()) ? reason : "Không có lý do";
+        String content = template.formatContent(job, cancelledBy, reasonText);
+        processNotification(userId, title, content, template, userEmail, null, null);
+    }
+
+    @Override
+    @Transactional
     public NotificationResponse processNotificationEvent(NotificationEventPayload event) {
         NotificationTemplate template = event.actionType();
         String title = (event.customTitle() != null && !event.customTitle().isBlank())
