@@ -176,6 +176,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
+    public void createReviewReceivedNotification(UUID revieweeId, String revieweeEmail, String reviewerName, Integer rating, String comment) {
+        NotificationTemplate template = NotificationTemplate.REVIEW_CREATED;
+        String title = template.getTitle();
+        String reviewer = (reviewerName != null && !reviewerName.isBlank()) ? reviewerName : "Người dùng";
+        int starRating = rating != null ? rating : 5;
+        String commentPreview = (comment != null && !comment.isBlank()) ? ": \"" + comment + "\"" : "";
+        String content = String.format("%s đã gửi đánh giá %d sao cho bạn%s", reviewer, starRating, commentPreview);
+        processNotification(revieweeId, title, content, template, revieweeEmail, null, null);
+    }
+
+    @Override
+    @Transactional
     public NotificationResponse processNotificationEvent(NotificationEventPayload event) {
         NotificationTemplate template = event.actionType();
         String title = (event.customTitle() != null && !event.customTitle().isBlank())

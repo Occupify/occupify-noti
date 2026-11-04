@@ -6,6 +6,7 @@ import com.occupify.notification.dto.event.ContractCompensationRequestedEvent;
 import com.occupify.notification.dto.event.ContractCompletedEvent;
 import com.occupify.notification.dto.event.ContractCreatedEvent;
 import com.occupify.notification.dto.event.ContractRejectedEvent;
+import com.occupify.notification.dto.event.ReviewCreatedEvent;
 import com.occupify.notification.service.EmailService;
 import com.occupify.notification.service.NotificationService;
 import java.util.UUID;
@@ -206,6 +207,35 @@ public class ContractEventListener {
             if (event.freelancerId() != null) {
                 notificationService.createContractCancelledNotification(event.freelancerId(), event.freelancerEmail(), "Bạn", jobTitle, reason);
             }
+        }
+    }
+
+    @RabbitHandler
+    public void handleReviewCreated(ReviewCreatedEvent event) {
+        if (event == null || event.reviewId() == null) {
+            log.warn("[Notification Contract Listener] Received invalid ReviewCreatedEvent");
+            return;
+        }
+        log.info("[Notification Contract Listener] Processing ReviewCreatedEvent for reviewId: {}, revieweeId: {}",
+                event.reviewId(), event.revieweeId());
+
+        String reviewer = (event.reviewerName() != null && !event.reviewerName().isBlank()) ? event.reviewerName() : "Đối tác";
+        int rating = event.rating() != null ? event.rating() : 5;
+        String comment = event.comment() != null ? event.comment() : "";
+
+        // 1. Email to reviewee
+        if (event.revieweeEmail() != null && !event.revieweeEmail().isBlank()) {
+            emailService.sendNotificationEmail(
+                    event.revieweeEmail(),
+                    "Bạn nhận được đánh giá mới từ " + reviewer,
+                    "Đánh giá mới (" + rating + " sao)",
+                    reviewer + " đã để lại đánh giá " + rating + " sao cho bạn: \"" + comment + "\""
+            );
+        }
+
+        // 2. In-app notification to reviewee
+        if (event.revieweeId() != null) {
+            notificationService.createReviewReceivedNotification(event.revieweeId(), event.revieweeEmail(), reviewer, rating, comment);
         }
     }
 }

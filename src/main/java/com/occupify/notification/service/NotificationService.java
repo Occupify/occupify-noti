@@ -41,6 +41,8 @@ public interface NotificationService {
 
     void createContractCancelledNotification(UUID userId, String userEmail, String cancelledByRoleOrName, String jobTitle, String reason);
 
+    void createReviewReceivedNotification(UUID revieweeId, String revieweeEmail, String reviewerName, Integer rating, String comment);
+
     NotificationResponse processNotificationEvent(NotificationEventPayload event);
 
     void processUserRegisteredEvent(UserRegisteredEvent event);

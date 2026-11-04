@@ -68,6 +68,9 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.contract-cancelled-routing-key:contract.cancelled}")
     private String contractCancelledRoutingKey;
 
+    @Value("${app.rabbitmq.review-created-routing-key:review.created}")
+    private String reviewCreatedRoutingKey;
+
     @Value("${app.rabbitmq.project-queue:occupify.notification.project.queue}")
     private String projectQueueName;
 
@@ -123,6 +126,11 @@ public class RabbitMQConfig {
     @Bean
     public Binding notiContractCancelledBinding(Queue notiContractQueue, TopicExchange contractExchange) {
         return BindingBuilder.bind(notiContractQueue).to(contractExchange).with(contractCancelledRoutingKey);
+    }
+
+    @Bean
+    public Binding notiReviewCreatedBinding(Queue notiContractQueue, TopicExchange contractExchange) {
+        return BindingBuilder.bind(notiContractQueue).to(contractExchange).with(reviewCreatedRoutingKey);
     }
 
     @Bean
@@ -290,6 +298,10 @@ public class RabbitMQConfig {
         idClassMapping.put("com.occupify.core.event.ContractCancelledEvent", com.occupify.notification.dto.event.ContractCancelledEvent.class);
         idClassMapping.put("com.occupify.notification.dto.event.ContractCancelledEvent", com.occupify.notification.dto.event.ContractCancelledEvent.class);
         idClassMapping.put("ContractCancelledEvent", com.occupify.notification.dto.event.ContractCancelledEvent.class);
+
+        idClassMapping.put("com.occupify.core.event.ReviewCreatedEvent", com.occupify.notification.dto.event.ReviewCreatedEvent.class);
+        idClassMapping.put("com.occupify.notification.dto.event.ReviewCreatedEvent", com.occupify.notification.dto.event.ReviewCreatedEvent.class);
+        idClassMapping.put("ReviewCreatedEvent", com.occupify.notification.dto.event.ReviewCreatedEvent.class);
         typeMapper.setIdClassMapping(idClassMapping);
 
         converter.setJavaTypeMapper(typeMapper);
