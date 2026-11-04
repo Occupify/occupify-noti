@@ -20,7 +20,8 @@ public enum NotificationTemplate {
     PROJECT_CLOSED("Dự án đã đóng", "Dự án '%s' của bạn đã được đóng.", NotificationCategory.PROJECT),
     PROPOSAL_CANCELLED("Đề xuất đã bị hủy", "Một đề xuất ứng tuyển cho dự án của bạn đã bị hủy.", NotificationCategory.JOB),
     CONTRACT_COMPLETED("Hợp đồng đã hoàn thành", "Hợp đồng cho công việc '%s' đã được hoàn thành.", NotificationCategory.CONTRACT),
-    CONTRACT_CANCELLED("Hợp đồng đã bị hủy", "Hợp đồng cho công việc '%s' đã bị hủy bởi %s. Lý do: %s", NotificationCategory.CONTRACT);
+    CONTRACT_CANCELLED("Hợp đồng đã bị hủy", "Hợp đồng cho công việc '%s' đã bị hủy bởi %s. Lý do: %s", NotificationCategory.CONTRACT),
+    REVIEW_CREATED("Đánh giá mới", "%s đã để lại một đánh giá %d sao cho bạn trên hợp đồng '%s'.", NotificationCategory.CONTRACT);
 
     private final String title;
     private final String contentTemplate;
