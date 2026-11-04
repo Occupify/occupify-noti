@@ -1,6 +1,7 @@
 package com.occupify.notification.listener;
 
 import com.occupify.notification.dto.event.ContractAcceptedEvent;
+import com.occupify.notification.dto.event.ContractCancelledEvent;
 import com.occupify.notification.dto.event.ContractCompensationRequestedEvent;
 import com.occupify.notification.dto.event.ContractCompletedEvent;
 import com.occupify.notification.dto.event.ContractCreatedEvent;
@@ -157,6 +158,54 @@ public class ContractEventListener {
         }
         if (event.employerId() != null) {
             notificationService.createContractCompletedNotification(event.employerId(), event.employerEmail(), jobTitle);
+        }
+    }
+
+    @RabbitHandler
+    public void handleContractCancelled(ContractCancelledEvent event) {
+        if (event == null || event.contractId() == null) {
+            log.warn("[Notification Contract Listener] Received invalid ContractCancelledEvent");
+            return;
+        }
+        log.info("[Notification Contract Listener] Processing ContractCancelledEvent for contractId: {}, cancelledBy: {}",
+                event.contractId(), event.cancelledByRole());
+
+        String jobTitle = (event.title() != null && !event.title().isBlank()) ? event.title() : "công việc";
+        String reason = (event.reason() != null && !event.reason().isBlank()) ? event.reason() : "Không có lý do";
+        boolean cancelledByEmployer = "EMPLOYER".equalsIgnoreCase(event.cancelledByRole());
+
+        if (cancelledByEmployer) {
+            // Cancelled by Employer -> Notify Freelancer via Email & In-App
+            if (event.freelancerEmail() != null && !event.freelancerEmail().isBlank()) {
+                emailService.sendNotificationEmail(
+                        event.freelancerEmail(),
+                        "Hợp đồng đã bị hủy: " + jobTitle,
+                        "Hợp đồng đã bị hủy",
+                        "Nhà tuyển dụng đã hủy hợp đồng cho công việc '" + jobTitle + "'. Lý do: " + reason
+                );
+            }
+            if (event.freelancerId() != null) {
+                notificationService.createContractCancelledNotification(event.freelancerId(), event.freelancerEmail(), "Nhà tuyển dụng", jobTitle, reason);
+            }
+            if (event.employerId() != null) {
+                notificationService.createContractCancelledNotification(event.employerId(), event.employerEmail(), "Bạn", jobTitle, reason);
+            }
+        } else {
+            // Cancelled by Employee/Freelancer -> Notify Employer via Email & In-App
+            if (event.employerEmail() != null && !event.employerEmail().isBlank()) {
+                emailService.sendNotificationEmail(
+                        event.employerEmail(),
+                        "Hợp đồng đã bị hủy: " + jobTitle,
+                        "Hợp đồng đã bị hủy",
+                        "Ứng viên đã hủy hợp đồng cho công việc '" + jobTitle + "'. Lý do: " + reason
+                );
+            }
+            if (event.employerId() != null) {
+                notificationService.createContractCancelledNotification(event.employerId(), event.employerEmail(), "Ứng viên", jobTitle, reason);
+            }
+            if (event.freelancerId() != null) {
+                notificationService.createContractCancelledNotification(event.freelancerId(), event.freelancerEmail(), "Bạn", jobTitle, reason);
+            }
         }
     }
 }

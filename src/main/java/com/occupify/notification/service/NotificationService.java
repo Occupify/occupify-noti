@@ -39,6 +39,8 @@ public interface NotificationService {
 
     void createContractCompletedNotification(UUID userId, String userEmail, String jobTitle);
 
+    void createContractCancelledNotification(UUID userId, String userEmail, String cancelledByRoleOrName, String jobTitle, String reason);
+
     NotificationResponse processNotificationEvent(NotificationEventPayload event);
 
     void processUserRegisteredEvent(UserRegisteredEvent event);
