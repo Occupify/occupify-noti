@@ -154,6 +154,16 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional
+    public void createContractCompletedNotification(UUID userId, String userEmail, String jobTitle) {
+        NotificationTemplate template = NotificationTemplate.CONTRACT_COMPLETED;
+        String title = template.getTitle();
+        String job = (jobTitle != null && !jobTitle.isBlank()) ? jobTitle : "công việc";
+        String content = template.formatContent(job);
+        processNotification(userId, title, content, template, userEmail, null, null);
+    }
+
+    @Override
+    @Transactional
     public NotificationResponse processNotificationEvent(NotificationEventPayload event) {
         NotificationTemplate template = event.actionType();
         String title = (event.customTitle() != null && !event.customTitle().isBlank())

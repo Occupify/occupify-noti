@@ -18,7 +18,8 @@ public enum NotificationTemplate {
     CONTRACT_COMPENSATED("Kích hoạt hợp đồng thất bại", "Hợp đồng cho công việc '%s' không thể kích hoạt do sự cố hệ thống. Lý do: %s", NotificationCategory.CONTRACT),
     PROJECT_CREATED("Dự án đã được tạo", "Dự án '%s' của bạn đã được đăng thành công.", NotificationCategory.PROJECT),
     PROJECT_CLOSED("Dự án đã đóng", "Dự án '%s' của bạn đã được đóng.", NotificationCategory.PROJECT),
-    PROPOSAL_CANCELLED("Đề xuất đã bị hủy", "Một đề xuất ứng tuyển cho dự án của bạn đã bị hủy.", NotificationCategory.JOB);
+    PROPOSAL_CANCELLED("Đề xuất đã bị hủy", "Một đề xuất ứng tuyển cho dự án của bạn đã bị hủy.", NotificationCategory.JOB),
+    CONTRACT_COMPLETED("Hợp đồng đã hoàn thành", "Hợp đồng cho công việc '%s' đã được hoàn thành.", NotificationCategory.CONTRACT);
 
     private final String title;
     private final String contentTemplate;

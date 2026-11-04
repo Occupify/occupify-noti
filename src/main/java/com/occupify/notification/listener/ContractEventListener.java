@@ -2,6 +2,7 @@ package com.occupify.notification.listener;
 
 import com.occupify.notification.dto.event.ContractAcceptedEvent;
 import com.occupify.notification.dto.event.ContractCompensationRequestedEvent;
+import com.occupify.notification.dto.event.ContractCompletedEvent;
 import com.occupify.notification.dto.event.ContractCreatedEvent;
 import com.occupify.notification.dto.event.ContractRejectedEvent;
 import com.occupify.notification.service.EmailService;
@@ -117,5 +118,45 @@ public class ContractEventListener {
         log.warn("[Notification Contract Listener] Processing ContractCompensationRequestedEvent for contractId: {}, reason: {}",
                 event.contractId(), event.reason());
         notificationService.createContractCompensatedNotification(event.contractId(), event.reason());
+    }
+
+    @RabbitHandler
+    public void handleContractCompleted(ContractCompletedEvent event) {
+        if (event == null || event.contractId() == null) {
+            log.warn("[Notification Contract Listener] Received invalid ContractCompletedEvent");
+            return;
+        }
+        log.info("[Notification Contract Listener] Processing ContractCompletedEvent for contractId: {}", event.contractId());
+
+        String jobTitle = (event.title() != null && !event.title().isBlank()) ? event.title() : "công việc";
+        String employerName = (event.employerName() != null && !event.employerName().isBlank()) ? event.employerName() : "Nhà tuyển dụng";
+
+        // 1. Email to freelancer
+        if (event.freelancerEmail() != null && !event.freelancerEmail().isBlank()) {
+            emailService.sendNotificationEmail(
+                    event.freelancerEmail(),
+                    "Hợp đồng đã hoàn thành: " + jobTitle,
+                    "Hợp đồng đã hoàn thành",
+                    "Chúc mừng bạn! Nhà tuyển dụng " + employerName + " đã hoàn thành hợp đồng cho công việc '" + jobTitle + "'."
+            );
+        }
+
+        // 2. Email to employer
+        if (event.employerEmail() != null && !event.employerEmail().isBlank()) {
+            emailService.sendNotificationEmail(
+                    event.employerEmail(),
+                    "Hợp đồng đã hoàn thành: " + jobTitle,
+                    "Hợp đồng đã hoàn thành",
+                    "Bạn đã đánh dấu hoàn thành hợp đồng cho công việc '" + jobTitle + "'."
+            );
+        }
+
+        // 3. In-app notifications
+        if (event.freelancerId() != null) {
+            notificationService.createContractCompletedNotification(event.freelancerId(), event.freelancerEmail(), jobTitle);
+        }
+        if (event.employerId() != null) {
+            notificationService.createContractCompletedNotification(event.employerId(), event.employerEmail(), jobTitle);
+        }
     }
 }

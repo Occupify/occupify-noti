@@ -37,6 +37,8 @@ public interface NotificationService {
 
     void createContractCompensatedNotification(UUID employerId, String reason);
 
+    void createContractCompletedNotification(UUID userId, String userEmail, String jobTitle);
+
     NotificationResponse processNotificationEvent(NotificationEventPayload event);
 
     void processUserRegisteredEvent(UserRegisteredEvent event);
