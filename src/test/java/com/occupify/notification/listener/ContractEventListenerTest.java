@@ -2,12 +2,16 @@ package com.occupify.notification.listener;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import com.occupify.notification.dto.event.ContractAcceptedEvent;
+import com.occupify.notification.dto.event.ContractCancelledEvent;
 import com.occupify.notification.dto.event.ContractCompensationRequestedEvent;
+import com.occupify.notification.dto.event.ContractCompletedEvent;
 import com.occupify.notification.dto.event.ContractCreatedEvent;
 import com.occupify.notification.dto.event.ContractRejectedEvent;
+import com.occupify.notification.dto.event.ReviewCreatedEvent;
 import com.occupify.notification.service.EmailService;
 import com.occupify.notification.service.NotificationService;
 import java.math.BigDecimal;
@@ -100,5 +104,60 @@ class ContractEventListenerTest {
         contractEventListener.handleContractCompensation(event);
 
         verify(notificationService).createContractCompensatedNotification(contractId, "Payment failed");
+    }
+
+    @Test
+    @DisplayName("Should still persist in-app notification when emailService throws in handleContractCreated")
+    void handleContractCreated_EmailFails_StillPersistsNotification() {
+        doThrow(new RuntimeException("SMTP connection timeout")).when(emailService).sendContractInvitationEmail(
+                any(), any(), any(), any(), any(), any(), any(), any(), any());
+
+        ContractCreatedEvent event = new ContractCreatedEvent(
+                UUID.randomUUID(), contractId, UUID.randomUUID(), UUID.randomUUID(),
+                employerId, freelancerId, "freelancer@test.com", "Welcome",
+                "Developer", "Backend Engineer", new BigDecimal("1000.00"), "FIXED",
+                LocalDateTime.now(), LocalDateTime.now().plusMonths(2), LocalDateTime.now(),
+                "Tech Corp", "employer@test.com");
+
+        contractEventListener.handleContractCreated(event);
+
+        verify(notificationService).createContractInvitationNotification(
+                eq(freelancerId), eq("freelancer@test.com"), eq("Tech Corp"),
+                eq("Backend Engineer"), eq("Welcome"), any());
+    }
+
+    @Test
+    @DisplayName("Should still persist in-app notification when emailService throws in handleContractCompleted")
+    void handleContractCompleted_EmailFails_StillPersistsNotification() {
+        doThrow(new RuntimeException("SMTP error")).when(emailService).sendNotificationEmail(
+                any(), any(), any(), any());
+
+        ContractCompletedEvent event = new ContractCompletedEvent(
+                UUID.randomUUID(), contractId, UUID.randomUUID(), UUID.randomUUID(),
+                employerId, freelancerId, employerId, "EMPLOYER",
+                "Backend Engineer", new BigDecimal("1000.00"), "FIXED",
+                LocalDateTime.now(), LocalDateTime.now(),
+                "employer@test.com", "Tech Corp", "freelancer@test.com", "Freelancer");
+
+        contractEventListener.handleContractCompleted(event);
+
+        verify(notificationService).createContractCompletedNotification(eq(freelancerId), eq("freelancer@test.com"), eq("Backend Engineer"));
+        verify(notificationService).createContractCompletedNotification(eq(employerId), eq("employer@test.com"), eq("Backend Engineer"));
+    }
+
+    @Test
+    @DisplayName("Should still persist in-app notification when emailService throws in handleReviewCreated")
+    void handleReviewCreated_EmailFails_StillPersistsNotification() {
+        doThrow(new RuntimeException("SMTP error")).when(emailService).sendNotificationEmail(
+                any(), any(), any(), any());
+
+        ReviewCreatedEvent event = new ReviewCreatedEvent(
+                UUID.randomUUID(), UUID.randomUUID(), contractId, employerId, "Tech Corp",
+                freelancerId, "Freelancer", "freelancer@test.com", 5, "Great work", LocalDateTime.now());
+
+        contractEventListener.handleReviewCreated(event);
+
+        verify(notificationService).createReviewReceivedNotification(
+                eq(freelancerId), eq("freelancer@test.com"), eq("Tech Corp"), eq(5), eq("Great work"));
     }
 }

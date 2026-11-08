@@ -38,17 +38,22 @@ public class ContractEventListener {
                 : "Công việc";
 
         // 1. Send invitation email first
-        emailService.sendContractInvitationEmail(
-                event.freelancerEmail(),
-                employerName,
-                jobTitle,
-                event.invitationMessage(),
-                event.role(),
-                event.agreedRate(),
-                event.salaryType(),
-                event.startedAt(),
-                event.finishedAt()
-        );
+        try {
+            emailService.sendContractInvitationEmail(
+                    event.freelancerEmail(),
+                    employerName,
+                    jobTitle,
+                    event.invitationMessage(),
+                    event.role(),
+                    event.agreedRate(),
+                    event.salaryType(),
+                    event.startedAt(),
+                    event.finishedAt()
+            );
+        } catch (Exception ex) {
+            log.warn("[Notification Contract Listener] Failed to send contract invitation email for contractId [{}]: {}",
+                    event.contractId(), ex.getMessage());
+        }
 
         // 2. Persist notification in noti DB for candidate
         UUID recipientId = event.employeeId() != null ? event.employeeId() : UUID.randomUUID();
@@ -77,7 +82,12 @@ public class ContractEventListener {
 
         // 1. Send email to employer
         if (event.employerEmail() != null && !event.employerEmail().isBlank()) {
-            emailService.sendContractAcceptedEmail(event.employerEmail(), freelancerName, event.title(), event.contractId());
+            try {
+                emailService.sendContractAcceptedEmail(event.employerEmail(), freelancerName, event.title(), event.contractId());
+            } catch (Exception ex) {
+                log.warn("[Notification Contract Listener] Failed to send contract accepted email for contractId [{}]: {}",
+                        event.contractId(), ex.getMessage());
+            }
         }
 
         // 2. Persist notification in noti DB for employer
@@ -102,7 +112,12 @@ public class ContractEventListener {
 
         // 1. Send email to employer
         if (event.employerEmail() != null && !event.employerEmail().isBlank()) {
-            emailService.sendContractRejectedEmail(event.employerEmail(), freelancerName, jobTitle, event.reason());
+            try {
+                emailService.sendContractRejectedEmail(event.employerEmail(), freelancerName, jobTitle, event.reason());
+            } catch (Exception ex) {
+                log.warn("[Notification Contract Listener] Failed to send contract rejected email for contractId [{}]: {}",
+                        event.contractId(), ex.getMessage());
+            }
         }
 
         // 2. Persist notification in noti DB for employer
@@ -135,22 +150,32 @@ public class ContractEventListener {
 
         // 1. Email to freelancer
         if (event.freelancerEmail() != null && !event.freelancerEmail().isBlank()) {
-            emailService.sendNotificationEmail(
-                    event.freelancerEmail(),
-                    "Hợp đồng đã hoàn thành: " + jobTitle,
-                    "Hợp đồng đã hoàn thành",
-                    "Chúc mừng bạn! Nhà tuyển dụng " + employerName + " đã hoàn thành hợp đồng cho công việc '" + jobTitle + "'."
-            );
+            try {
+                emailService.sendNotificationEmail(
+                        event.freelancerEmail(),
+                        "Hợp đồng đã hoàn thành: " + jobTitle,
+                        "Hợp đồng đã hoàn thành",
+                        "Chúc mừng bạn! Nhà tuyển dụng " + employerName + " đã hoàn thành hợp đồng cho công việc '" + jobTitle + "'."
+                );
+            } catch (Exception ex) {
+                log.warn("[Notification Contract Listener] Failed to send contract completed email to freelancer [{}]: {}",
+                        event.freelancerEmail(), ex.getMessage());
+            }
         }
 
         // 2. Email to employer
         if (event.employerEmail() != null && !event.employerEmail().isBlank()) {
-            emailService.sendNotificationEmail(
-                    event.employerEmail(),
-                    "Hợp đồng đã hoàn thành: " + jobTitle,
-                    "Hợp đồng đã hoàn thành",
-                    "Bạn đã đánh dấu hoàn thành hợp đồng cho công việc '" + jobTitle + "'."
-            );
+            try {
+                emailService.sendNotificationEmail(
+                        event.employerEmail(),
+                        "Hợp đồng đã hoàn thành: " + jobTitle,
+                        "Hợp đồng đã hoàn thành",
+                        "Bạn đã đánh dấu hoàn thành hợp đồng cho công việc '" + jobTitle + "'."
+                );
+            } catch (Exception ex) {
+                log.warn("[Notification Contract Listener] Failed to send contract completed email to employer [{}]: {}",
+                        event.employerEmail(), ex.getMessage());
+            }
         }
 
         // 3. In-app notifications
@@ -178,12 +203,17 @@ public class ContractEventListener {
         if (cancelledByEmployer) {
             // Cancelled by Employer -> Notify Freelancer via Email & In-App
             if (event.freelancerEmail() != null && !event.freelancerEmail().isBlank()) {
-                emailService.sendNotificationEmail(
-                        event.freelancerEmail(),
-                        "Hợp đồng đã bị hủy: " + jobTitle,
-                        "Hợp đồng đã bị hủy",
-                        "Nhà tuyển dụng đã hủy hợp đồng cho công việc '" + jobTitle + "'. Lý do: " + reason
-                );
+                try {
+                    emailService.sendNotificationEmail(
+                            event.freelancerEmail(),
+                            "Hợp đồng đã bị hủy: " + jobTitle,
+                            "Hợp đồng đã bị hủy",
+                            "Nhà tuyển dụng đã hủy hợp đồng cho công việc '" + jobTitle + "'. Lý do: " + reason
+                    );
+                } catch (Exception ex) {
+                    log.warn("[Notification Contract Listener] Failed to send contract cancelled email to freelancer [{}]: {}",
+                            event.freelancerEmail(), ex.getMessage());
+                }
             }
             if (event.freelancerId() != null) {
                 notificationService.createContractCancelledNotification(event.freelancerId(), event.freelancerEmail(), "Nhà tuyển dụng", jobTitle, reason);
@@ -194,12 +224,17 @@ public class ContractEventListener {
         } else {
             // Cancelled by Employee/Freelancer -> Notify Employer via Email & In-App
             if (event.employerEmail() != null && !event.employerEmail().isBlank()) {
-                emailService.sendNotificationEmail(
-                        event.employerEmail(),
-                        "Hợp đồng đã bị hủy: " + jobTitle,
-                        "Hợp đồng đã bị hủy",
-                        "Ứng viên đã hủy hợp đồng cho công việc '" + jobTitle + "'. Lý do: " + reason
-                );
+                try {
+                    emailService.sendNotificationEmail(
+                            event.employerEmail(),
+                            "Hợp đồng đã bị hủy: " + jobTitle,
+                            "Hợp đồng đã bị hủy",
+                            "Ứng viên đã hủy hợp đồng cho công việc '" + jobTitle + "'. Lý do: " + reason
+                    );
+                } catch (Exception ex) {
+                    log.warn("[Notification Contract Listener] Failed to send contract cancelled email to employer [{}]: {}",
+                            event.employerEmail(), ex.getMessage());
+                }
             }
             if (event.employerId() != null) {
                 notificationService.createContractCancelledNotification(event.employerId(), event.employerEmail(), "Ứng viên", jobTitle, reason);
@@ -225,12 +260,17 @@ public class ContractEventListener {
 
         // 1. Email to reviewee
         if (event.revieweeEmail() != null && !event.revieweeEmail().isBlank()) {
-            emailService.sendNotificationEmail(
-                    event.revieweeEmail(),
-                    "Bạn nhận được đánh giá mới từ " + reviewer,
-                    "Đánh giá mới (" + rating + " sao)",
-                    reviewer + " đã để lại đánh giá " + rating + " sao cho bạn: \"" + comment + "\""
-            );
+            try {
+                emailService.sendNotificationEmail(
+                        event.revieweeEmail(),
+                        "Bạn nhận được đánh giá mới từ " + reviewer,
+                        "Đánh giá mới (" + rating + " sao)",
+                        reviewer + " đã để lại đánh giá " + rating + " sao cho bạn: \"" + comment + "\""
+                );
+            } catch (Exception ex) {
+                log.warn("[Notification Contract Listener] Failed to send review received email to reviewee [{}]: {}",
+                        event.revieweeEmail(), ex.getMessage());
+            }
         }
 
         // 2. In-app notification to reviewee
